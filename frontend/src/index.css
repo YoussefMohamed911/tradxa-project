@@ -1,0 +1,129 @@
+/* =========================
+   TRADXA DESIGN SYSTEM
+========================= */
+
+:root {
+  --bg-page: #edf3f7;
+  --bg-header: rgba(247, 250, 252, 0.94);
+
+  --surface-1: #ffffff;
+  --surface-2: #f7f9fb;
+  --surface-3: #eef3f6;
+  --surface-hover: #f1f6f7;
+
+  --text-primary: #102231;
+  --text-secondary: #526779;
+  --text-muted: #8192a1;
+
+  --border: rgba(18, 42, 60, 0.09);
+  --border-strong: rgba(18, 42, 60, 0.15);
+
+  --accent: #159b8b;
+  --accent-hover: #108577;
+  --accent-soft: rgba(21, 155, 139, 0.09);
+
+  --positive: #15966f;
+  --negative: #d65060;
+  --warning: #c89231;
+
+  --shadow-sm: 0 6px 18px rgba(20, 45, 65, 0.055);
+
+  --shadow-md: 0 14px 35px rgba(20, 45, 65, 0.08);
+
+  --shadow-lg: 0 24px 60px rgba(20, 45, 65, 0.1);
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+[data-theme="dark"] {
+  --bg-page: #06111f;
+  --bg-header: rgba(7, 17, 29, 0.94);
+
+  --surface-1: #091827;
+  --surface-2: #0c1c2c;
+  --surface-3: #102235;
+  --surface-hover: #102536;
+
+  --text-primary: #f1f5f8;
+  --text-secondary: #9eb0bf;
+  --text-muted: #687e91;
+
+  --border: rgba(255, 255, 255, 0.065);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  --accent: #67c9b8;
+  --accent-hover: #7ad4c4;
+  --accent-soft: rgba(103, 201, 184, 0.085);
+
+  --positive: #4dca9e;
+  --negative: #ef5964;
+  --warning: #dfb34d;
+
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.13);
+
+  --shadow-md: 0 14px 35px rgba(0, 0, 0, 0.17);
+
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+/* =========================
+   RESET
+========================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+
+  font-family: Arial, sans-serif;
+
+  background: var(--bg-page);
+  color: var(--text-primary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* =========================
+   RTL
+========================= */
+
+html[dir="rtl"] body {
+  direction: rtl;
+}

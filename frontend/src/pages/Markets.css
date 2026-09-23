@@ -1,0 +1,581 @@
+/* ===============================
+   TRADXA MARKETS PAGE
+================================ */
+
+.markets-page {
+  min-height: calc(100vh - 70px);
+  background: var(--bg);
+}
+
+/* ===============================
+   HERO
+================================ */
+
+.markets-hero {
+  padding: 52px 0 30px;
+  border-bottom: 1px solid var(--border);
+}
+
+.markets-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.markets-eyebrow {
+  display: block;
+  margin-bottom: 9px;
+
+  color: var(--accent);
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.markets-heading h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 780;
+  letter-spacing: -1.3px;
+}
+
+.markets-heading p {
+  margin: 9px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+/* ===============================
+   STATUS
+================================ */
+
+.markets-status {
+  min-width: 165px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  background: var(--surface-1);
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.markets-live-dot {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  background: var(--accent);
+  border-radius: 50%;
+
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.markets-status div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.markets-status strong {
+  color: var(--text-primary);
+  font-size: 9px;
+}
+
+.markets-status div span {
+  color: var(--text-muted);
+  font-size: 8px;
+}
+
+/* ===============================
+   CONTENT
+================================ */
+
+.markets-content {
+  padding: 26px 0 70px;
+}
+
+/* ===============================
+   TOOLBAR
+================================ */
+
+.markets-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 16px;
+}
+
+.markets-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.markets-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.markets-tab {
+  min-height: 36px;
+
+  padding: 0 14px;
+
+  flex-shrink: 0;
+
+  color: var(--text-muted);
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  font: inherit;
+  font-size: 9px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.markets-tab:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
+}
+
+.markets-tab.active {
+  color: var(--accent);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 8%,
+      var(--surface-1)
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--accent) 25%,
+      var(--border)
+    );
+}
+
+.markets-count {
+  flex-shrink: 0;
+
+  color: var(--text-muted);
+
+  font-size: 8px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+/* ===============================
+   TABLE
+================================ */
+
+.markets-table-shell {
+  overflow: hidden;
+
+  background: var(--surface-1);
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.markets-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.markets-table {
+  width: 100%;
+  min-width: 850px;
+
+  border-collapse: collapse;
+}
+
+.markets-table th {
+  height: 44px;
+
+  padding: 0 16px;
+
+  color: var(--text-muted);
+  background: var(--surface-2);
+
+  border-bottom: 1px solid var(--border);
+
+  text-align: left;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+}
+
+.markets-table td {
+  height: 66px;
+
+  padding: 0 16px;
+
+  color: var(--text-primary);
+
+  border-bottom: 1px solid var(--border);
+
+  font-size: 10px;
+}
+
+.markets-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.markets-table tbody tr:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--surface-2) 65%,
+      transparent
+    );
+}
+
+/* ===============================
+   INSTRUMENT
+================================ */
+
+.market-instrument {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.market-instrument > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.market-instrument strong {
+  color: var(--text-primary);
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.market-instrument div span {
+  color: var(--text-muted);
+  font-size: 8px;
+}
+
+.market-status-dot {
+  width: 6px;
+  height: 6px;
+
+  display: block;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.market-status-dot.up {
+  background: #41c98e;
+}
+
+.market-status-dot.down {
+  background: #ef5964;
+}
+
+/* ===============================
+   NUMBERS
+================================ */
+
+.market-number {
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.market-number.muted {
+  color: var(--text-secondary);
+}
+
+.market-ask {
+  color: var(--accent) !important;
+}
+
+/* ===============================
+   CHANGE
+================================ */
+
+.market-change-badge {
+  min-width: 62px;
+  min-height: 27px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 9px;
+
+  border-radius: 6px;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.market-change-badge.up {
+  color: #41c98e;
+  background: rgba(65, 201, 142, 0.08);
+}
+
+.market-change-badge.down {
+  color: #ef5964;
+  background: rgba(239, 89, 100, 0.08);
+}
+
+/* ===============================
+   STATUS BADGE
+================================ */
+
+.market-open-badge {
+  min-height: 24px;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0 8px;
+
+  color: var(--accent);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 7%,
+      transparent
+    );
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--accent) 20%,
+      transparent
+    );
+
+  border-radius: 5px;
+
+  font-size: 7px;
+  font-weight: 850;
+
+  letter-spacing: 0.6px;
+}
+
+/* ===============================
+   MOBILE CARDS
+================================ */
+
+.markets-mobile-grid {
+  display: none;
+}
+
+.markets-mobile-card {
+  padding: 16px;
+
+  background: var(--surface-1);
+
+  border: 1px solid var(--border);
+  border-radius: 11px;
+}
+
+.mobile-market-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 14px;
+}
+
+.mobile-market-symbol {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.mobile-market-symbol strong {
+  color: var(--text-primary);
+
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.mobile-market-name {
+  display: block;
+
+  margin-top: 5px;
+
+  color: var(--text-muted);
+  font-size: 8px;
+}
+
+.mobile-market-prices,
+.mobile-market-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.mobile-market-prices div,
+.mobile-market-range div {
+  padding: 11px;
+
+  background: var(--surface-2);
+
+  border-radius: 7px;
+}
+
+.mobile-market-prices span,
+.mobile-market-range span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: var(--text-muted);
+
+  font-size: 7px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.mobile-market-prices strong,
+.mobile-market-range strong {
+  color: var(--text-primary);
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+}
+
+/* ===============================
+   DISCLAIMER
+================================ */
+
+.markets-disclaimer {
+  max-width: 720px;
+
+  margin: 17px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 8px;
+  line-height: 1.7;
+}
+
+/* ===============================
+   RTL
+================================ */
+
+html[dir="rtl"] .markets-heading {
+  text-align: right;
+}
+
+html[dir="rtl"] .markets-table th {
+  text-align: right;
+}
+
+/* ===============================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+  .markets-hero {
+    padding: 34px 0 22px;
+  }
+
+  .markets-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .markets-status {
+    width: 100%;
+  }
+
+  .markets-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .markets-tabs {
+    width: 100%;
+  }
+
+  .markets-table-shell {
+    display: none;
+  }
+
+  .markets-mobile-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+}
+
+@media (max-width: 450px) {
+  .markets-mobile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .markets-heading h1 {
+    font-size: 31px;
+  }
+}

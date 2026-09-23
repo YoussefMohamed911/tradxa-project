@@ -1,0 +1,172 @@
+{
+  "nav": {
+
+    "books": "Books",
+    "markets": "FX Company",
+    "home": "Home",
+    "news": "News",
+    "calendar": "Economic Calendar",
+    "signals": "Signals",
+    "books": "Books",
+    "login": "Login",
+    "register": "Register"
+  },
+
+  "market": {
+    "title": "GTCFX Markets",
+    "subtitle": "Live market overview",
+    "all": "All",
+    "metals": "Metals",
+    "forex": "Forex",
+    "energy": "Energy",
+    "stocks": "Stocks",
+
+    "instruments": {
+      "gold": "Gold",
+      "silver": "Silver",
+      "platinum": "Platinum",
+      "palladium": "Palladium",
+      "euroPound": "Euro / Pound",
+      "euroYen": "Euro / Yen",
+      "poundYen": "Pound / Yen",
+      "wti": "WTI Oil",
+      "brent": "Brent Oil",
+      "naturalGas": "Natural Gas",
+      "apple": "Apple",
+      "nvidia": "NVIDIA",
+      "tesla": "Tesla"
+    }
+  },
+
+  "categories": {
+    "gold": "GOLD",
+    "silver": "SILVER",
+    "oil": "OIL",
+    "forex": "FOREX",
+    "crypto": "CRYPTO",
+    "commodities": "COMMODITIES",
+    "stocks": "STOCKS"
+  },
+
+  "ticker": {
+    "latestNews": "LATEST NEWS",
+
+    "news": {
+      "gold": "Gold markets await new economic data",
+      "silver": "Silver prices move higher in global trading",
+      "oil": "Oil markets react to new supply expectations",
+      "forex": "Dollar moves against major global currencies",
+      "crypto": "Bitcoin volatility returns to the market"
+    }
+  },
+
+  "homeNews": {
+    "marketNews": "Market News",
+    "openCategoryNews": "Open {{category}} news",
+
+    "categories": {
+      "forex": "Forex",
+      "metals": "Metals",
+      "crypto": "Crypto",
+      "oil": "Oil",
+      "stocks": "Stocks",
+      "commodities": "Commodities"
+    },
+
+    "headlines": {
+      "forex": "Major currency pairs react to the latest global market moves",
+      "metals": "Gold and silver markets move as investors reassess the global outlook",
+      "crypto": "Bitcoin and crypto markets see renewed volatility",
+      "oil": "Oil prices respond to new supply and demand developments",
+      "stocks": "Global stock markets react to the latest economic developments",
+      "commodities": "Commodity markets track changing global demand expectations"
+    }
+  },
+
+  "homeAnalysis": {
+    "eyebrow": "TRADXA ANALYSIS",
+    "title": "Market Analysis",
+    "description": "Latest technical market analysis from our Telegram channel.",
+    "latestAnalysis": "Latest Analysis",
+    "live": "LIVE",
+
+    "placeholders": {
+      "1": "Latest technical analysis for XAU/USD from Telegram will appear here.",
+      "2": "Latest technical analysis for BTC/USD from Telegram will appear here.",
+      "3": "Latest technical analysis for USOIL from Telegram will appear here.",
+      "4": "Latest technical analysis for USD30 from Telegram will appear here.",
+      "5": "Latest technical analysis for DAX/USD from Telegram will appear here.",
+      "6": "Latest technical analysis for EUR/USD from Telegram will appear here.",
+      "7": "Latest technical analysis for GBP/USD from Telegram will appear here.",
+      "8": "Latest technical analysis for AUD/USD from Telegram will appear here.",
+      "9": "Latest technical analysis for NZD/USD from Telegram will appear here.",
+      "10": "Latest technical analysis for USD/CAD from Telegram will appear here.",
+      "11": "Latest technical analysis for USD/CHF from Telegram will appear here.",
+      "12": "Latest technical analysis for USD/JPY from Telegram will appear here."
+    }
+  },
+
+  "news": {
+    "marketUpdate": "Market Update",
+    "gold": "Gold holds firm as markets await fresh economic data",
+    "silver": "Silver prices gain momentum in global trading",
+    "oil": "Oil markets react to changing supply expectations",
+    "forex": "Dollar moves against major global currencies",
+    "crypto": "Bitcoin volatility returns as markets remain active",
+    "commodities": "Commodities markets react to shifting global demand",
+    "stocks": "Global stocks move as investors assess market conditions"
+  },
+
+  "calendar": {
+    "filter": "Filter",
+    "filterByImpact": "Filter by impact",
+    "selectMultiple": "Select one or more",
+    "reset": "Reset",
+    "noEvents": "No events match the selected filters",
+
+    "time": "Time",
+    "currency": "Currency",
+    "impact": "Impact",
+    "event": "Event",
+    "actual": "Actual",
+    "forecast": "Forecast",
+    "previous": "Previous",
+
+    "all": "All",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+
+    "events": {
+      "cpi": "CPI m/m",
+      "ecbRate": "ECB Interest Rate Decision",
+      "retailSales": "Core Retail Sales m/m",
+      "boeSpeech": "BOE Governor Speaks",
+      "oilInventories": "Crude Oil Inventories"
+    }
+  },
+
+  "common": {
+    "minutesAgo": "{{count}} min ago",
+    "installApp": "Install App"
+  },
+
+  "footer": {
+    "description": "Market intelligence, financial news, economic events and trading tools in one place.",
+    "platform": "Platform",
+    "contact": "Contact",
+    "contactSubtitle": "Get in touch with the Tradxa team.",
+    "email": "Email",
+    "followUs": "Follow us",
+    "chatWithUs": "Chat with us",
+    "rights": "All rights reserved."
+  },
+
+  "home": {
+    "latestNews": "Latest Market News",
+    "viewAllNews": "View All News",
+    "globalEvents": "GLOBAL EVENTS",
+    "economicCalendar": "Economic Calendar",
+    "viewCalendar": "View Full Calendar"
+  }
+}

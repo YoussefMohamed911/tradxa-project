@@ -1,0 +1,452 @@
+/* =========================
+   TRADXA HEADER
+========================= */
+
+.header {
+  width: 100%;
+  height: 82px;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+
+  background: var(--bg-header);
+
+  border-bottom: 1px solid var(--border);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* =========================
+   INNER
+========================= */
+
+.header .header-inner {
+  width: min(1180px, calc(100% - 40px));
+  height: 100%;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 28px;
+
+  direction: ltr;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.header .brand {
+  width: 170px;
+
+  display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+}
+
+.header .brand-logo {
+  width: 170px !important;
+  max-width: 170px !important;
+
+  height: 48px !important;
+  max-height: 48px !important;
+
+  display: block;
+
+  object-fit: contain;
+
+  object-position: left center;
+}
+
+/* =========================
+   NAV
+========================= */
+
+.header .nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 25px;
+
+  min-width: 0;
+}
+
+.header .nav-link {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+
+  height: 82px;
+
+  padding: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  transition: color 0.2s ease;
+}
+
+.header .nav-link:hover {
+  color: var(--text-primary);
+}
+
+/* ACTIVE PAGE */
+
+.header .nav-link::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: 0;
+  height: 2px;
+
+  border-radius: 99px;
+
+  background: var(--accent);
+
+  transform: translateX(-50%);
+
+  transition: width 0.2s ease;
+}
+
+.header .nav-link.active {
+  color: var(--accent);
+
+  font-weight: 700;
+}
+
+.header .nav-link.active::after {
+  width: 26px;
+
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.header .header-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  direction: ltr;
+}
+
+/* SMALL BUTTON */
+
+.header .header-control-btn {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  color: var(--text-secondary);
+
+  background: var(--surface-1);
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.header .header-control-btn:hover {
+  color: var(--accent);
+
+  background: var(--accent-soft);
+
+  border-color: var(--border-strong);
+
+  transform: translateY(-1px);
+}
+
+/* =========================
+   INSTALL APP
+========================= */
+
+.header .install-app-btn {
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 12px;
+
+  color: var(--text-secondary);
+
+  background: var(--surface-1);
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.header .install-app-btn:hover {
+  color: var(--accent);
+
+  background: var(--accent-soft);
+
+  border-color: var(--border-strong);
+
+  transform: translateY(-1px);
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.header .login-btn {
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 15px;
+
+  color: var(--accent);
+
+  background: var(--accent-soft);
+
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+
+  border-radius: 10px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.header .login-btn:hover {
+  color: var(--accent-hover);
+
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+
+  transform: translateY(-1px);
+}
+
+/* =========================
+   ARABIC
+========================= */
+
+html[dir="rtl"] .header .nav {
+  direction: rtl;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+  .header .header-inner {
+    gap: 18px;
+  }
+
+  .header .nav {
+    gap: 16px;
+  }
+
+  .header .nav-link {
+    font-size: 11px;
+  }
+
+  .header .brand,
+  .header .brand-logo {
+    width: 145px !important;
+    max-width: 145px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .header {
+    height: auto;
+  }
+
+  .header .header-inner {
+    min-height: 74px;
+
+    flex-wrap: wrap;
+
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .header .nav {
+    width: 100%;
+
+    order: 3;
+
+    justify-content: flex-start;
+
+    overflow-x: auto;
+
+    gap: 22px;
+
+    scrollbar-width: none;
+  }
+
+  .header .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header .nav-link {
+    height: 40px;
+
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .header .header-inner {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .header .brand,
+  .header .brand-logo {
+    width: 125px !important;
+    max-width: 125px !important;
+  }
+
+  .header .brand-logo {
+    height: 40px !important;
+    max-height: 40px !important;
+  }
+
+  .header .header-actions {
+    gap: 5px;
+  }
+
+  .header .header-control-btn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .header .login-btn,
+  .header .install-app-btn {
+    height: 35px;
+
+    padding: 0 9px;
+
+    font-size: 9px;
+  }
+}
+.register-btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 16px;
+
+  color: #071611;
+  background: var(--accent);
+
+  border-radius: 8px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-decoration: none;
+}
+
+.register-btn:hover {
+  background: var(--accent-hover);
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  min-height: 40px;
+  padding: 0 14px;
+
+  color: var(--text-primary);
+  background: var(--surface-2);
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.user-name {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.user-name:hover {
+  color: var(--accent);
+}
