@@ -123,6 +123,9 @@
     "selectMultiple": "Select one or more",
     "reset": "Reset",
     "noEvents": "No events match the selected filters",
+    "loading": "Loading economic events...",
+    "loadError": "Unable to load economic events.",
+    "noEventsToday": "No economic events scheduled today.",
 
     "time": "Time",
     "currency": "Currency",

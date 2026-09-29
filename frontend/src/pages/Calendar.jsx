@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import "./Calendar.css";
+
 const impacts = ["all", "high", "medium", "low"];
 
 function getWeekRange(date) {
@@ -35,50 +36,57 @@ function formatTime(value) {
   });
 }
 
+function formatLocalDateInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function Calendar() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [realtimeLive, setRealtimeLive] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [impact, setImpact] = useState("all");
   const [currency, setCurrency] = useState("all");
+
+  const requestIdRef = useRef(0);
+  const eventsRef = useRef(events);
+
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
 
   const { monday, sunday } = useMemo(
     () => getWeekRange(selectedDate),
     [selectedDate]
   );
 
+  const weekStartMs = monday.getTime();
+  const weekEndMs = sunday.getTime();
+
   useEffect(() => {
-  loadEvents();
+    let cancelled = false;
 
-  const channel = supabase
-    .channel("tradxa-economic-calendar")
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "economic_events",
-      },
-      () => {
-        loadEvents();
+    async function loadEvents(showLoading) {
+      const requestId = ++requestIdRef.current;
+
+      if (showLoading) {
+        setLoading(true);
+        setError(false);
       }
-    )
-    .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [monday.getTime(), sunday.getTime()]);
+      const weekStart = new Date(weekStartMs);
+      const weekEnd = new Date(weekEndMs);
 
-
-  async function loadEvents() {
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from("economic_events")
-      .select(
-        `
+      const { data, error: queryError } = await supabase
+        .from("economic_events")
+        .select(
+          `
         id,
         external_id,
         event_time,
@@ -90,20 +98,80 @@ function Calendar() {
         forecast,
         previous
         `
-      )
-      .gte("event_time", monday.toISOString())
-      .lte("event_time", sunday.toISOString())
-      .order("event_time", { ascending: true });
+        )
+        .gte("event_time", weekStart.toISOString())
+        .lte("event_time", weekEnd.toISOString())
+        .order("event_time", { ascending: true });
 
-    if (error) {
-      console.error("Calendar error:", error);
-      setEvents([]);
-    } else {
+      if (cancelled || requestId !== requestIdRef.current) {
+        return;
+      }
+
+      if (queryError) {
+        console.error("Calendar error:", queryError);
+
+        if (showLoading || eventsRef.current.length === 0) {
+          setEvents([]);
+          setError(true);
+        }
+
+        setLoading(false);
+        return;
+      }
+
+      setError(false);
       setEvents(data || []);
+      setLoading(false);
     }
 
-    setLoading(false);
-  }
+    loadEvents(true);
+
+    const channel = supabase
+      .channel("tradxa-economic-calendar")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "economic_events",
+        },
+        () => {
+          loadEvents(false);
+        }
+      )
+      .subscribe((status, err) => {
+        if (cancelled) {
+          return;
+        }
+
+        if (status === "SUBSCRIBED") {
+          setRealtimeLive(true);
+        } else if (
+          status === "CHANNEL_ERROR" ||
+          status === "TIMED_OUT" ||
+          status === "CLOSED"
+        ) {
+          if (err) {
+            console.warn("Calendar realtime status:", status, err);
+          }
+          setRealtimeLive(false);
+        } else {
+          setRealtimeLive(false);
+        }
+      });
+
+    const fallback = setInterval(() => {
+      loadEvents(false);
+    }, 60000);
+
+    return () => {
+      cancelled = true;
+      requestIdRef.current += 1;
+      clearInterval(fallback);
+      supabase.removeChannel(channel);
+      setRealtimeLive(false);
+    };
+  }, [weekStartMs, weekEndMs]);
 
   const currencies = useMemo(() => {
     return [
@@ -125,31 +193,32 @@ function Calendar() {
 
       return impactMatch && currencyMatch;
     });
-  }, 
-  
-  [events, impact, currency]);
+  }, [events, impact, currency]);
 
   const groupedEvents = useMemo(() => {
-  const groups = {};
+    const groups = {};
 
-  filteredEvents.forEach((event) => {
-    const date = new Date(event.event_time);
+    filteredEvents.forEach((event) => {
+      const date = new Date(event.event_time);
 
-    const key = date.toLocaleDateString("en-CA");
+      const key = formatLocalDateInput(date);
 
-    if (!groups[key]) {
-      groups[key] = {
-        date,
-        events: [],
-      };
-    }
+      if (!groups[key]) {
+        const dayDate = new Date(date);
+        dayDate.setHours(0, 0, 0, 0);
 
-    groups[key].events.push(event);
-  });
+        groups[key] = {
+          key,
+          date: dayDate,
+          events: [],
+        };
+      }
 
-  return Object.values(groups);
-}, [filteredEvents]);
+      groups[key].events.push(event);
+    });
 
+    return Object.values(groups);
+  }, [filteredEvents]);
 
   const changeWeek = (amount) => {
     const next = new Date(selectedDate);
@@ -160,6 +229,13 @@ function Calendar() {
   const goToday = () => {
     setSelectedDate(new Date());
   };
+
+  const showInitialLoading = loading;
+  const showError = error && events.length === 0 && !loading;
+  const showEmptyWeek =
+    !loading && !error && events.length === 0;
+  const showEmptyFilters =
+    !loading && events.length > 0 && groupedEvents.length === 0;
 
   return (
     <main className="calendar-page">
@@ -180,11 +256,23 @@ function Calendar() {
             </div>
 
             <div className="calendar-status">
-              <span className="calendar-live-dot" />
+              <span
+                className={`calendar-live-dot${
+                  realtimeLive ? "" : " is-offline"
+                }`}
+              />
 
               <div>
-                <strong>Live Economic Data</strong>
-                <span>Powered by Tradxa</span>
+                <strong>
+                  {realtimeLive
+                    ? "Live Economic Data"
+                    : "Economic Data"}
+                </strong>
+                <span>
+                  {realtimeLive
+                    ? "Powered by Tradxa"
+                    : "Realtime disconnected"}
+                </span>
               </div>
             </div>
           </div>
@@ -281,9 +369,7 @@ function Calendar() {
 
                 <input
                   type="date"
-                  value={selectedDate
-                    .toISOString()
-                    .slice(0, 10)}
+                  value={formatLocalDateInput(selectedDate)}
                   onChange={(e) => {
                     if (!e.target.value) return;
 
@@ -299,139 +385,145 @@ function Calendar() {
           </div>
 
           <div className="calendar-days-list">
-  {loading ? (
-    <div className="calendar-empty-state">
-      Loading economic events...
-    </div>
-  ) : groupedEvents.length === 0 ? (
-    <div className="calendar-empty-state">
-      No economic events found.
-    </div>
-  ) : (
-    groupedEvents.map((group, groupIndex) => {
-      const isToday =
-        group.date.toDateString() ===
-        new Date().toDateString();
-
-      return (
-        <section
-          key={group.date.toISOString()}
-          className={`calendar-day-group ${
-            groupIndex % 2 === 1
-              ? "calendar-day-alt"
-              : ""
-          }`}
-        >
-          <div className="calendar-day-heading">
-            <div className="calendar-day-heading-main">
-              <span className="calendar-weekday">
-                {group.date
-                  .toLocaleDateString("en-US", {
-                    weekday: "short",
-                  })
-                  .toUpperCase()}
-              </span>
-
-              <div className="calendar-day-date">
-                <strong>
-                  {group.date.toLocaleDateString(
-                    "en-US",
-                    {
-                      month: "long",
-                      day: "numeric",
-                    }
-                  )}
-                </strong>
-
-                <span>
-                  {group.date.getFullYear()}
-                </span>
+            {showInitialLoading ? (
+              <div className="calendar-empty-state">
+                Loading economic events...
               </div>
+            ) : showError ? (
+              <div className="calendar-empty-state">
+                Unable to load economic events.
+              </div>
+            ) : showEmptyWeek ? (
+              <div className="calendar-empty-state">
+                No economic events found.
+              </div>
+            ) : showEmptyFilters ? (
+              <div className="calendar-empty-state">
+                No events match the selected filters.
+              </div>
+            ) : (
+              groupedEvents.map((group, groupIndex) => {
+                const isToday =
+                  group.key === formatLocalDateInput(new Date());
 
-              {isToday && (
-                <span className="calendar-today-tag">
-                  TODAY
-                </span>
-              )}
-
-              <div className="calendar-day-line" />
-            </div>
-
-            <span className="calendar-event-count">
-              {group.events.length}{" "}
-              {group.events.length === 1
-                ? "event"
-                : "events"}
-            </span>
-          </div>
-
-          <div className="calendar-table-scroll">
-            <table className="calendar-table">
-              <thead>
-                <tr>
-                  <th>Time</th>
-                  <th>Currency</th>
-                  <th>Event</th>
-                  <th>Impact</th>
-                  <th>Actual</th>
-                  <th>Forecast</th>
-                  <th>Previous</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {group.events.map((event) => (
-                  <tr key={event.id}>
-                    <td className="calendar-time">
-                      {formatTime(event.event_time)}
-                    </td>
-
-                    <td>
-                      <div className="calendar-currency">
-                        <span className="calendar-country">
-                          {event.country}
+                return (
+                  <section
+                    key={group.key}
+                    className={`calendar-day-group ${
+                      groupIndex % 2 === 1
+                        ? "calendar-day-alt"
+                        : ""
+                    }`}
+                  >
+                    <div className="calendar-day-heading">
+                      <div className="calendar-day-heading-main">
+                        <span className="calendar-weekday">
+                          {group.date
+                            .toLocaleDateString("en-US", {
+                              weekday: "short",
+                            })
+                            .toUpperCase()}
                         </span>
 
-                        <strong>
-                          {event.currency}
-                        </strong>
+                        <div className="calendar-day-date">
+                          <strong>
+                            {group.date.toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </strong>
+
+                          <span>
+                            {group.date.getFullYear()}
+                          </span>
+                        </div>
+
+                        {isToday && (
+                          <span className="calendar-today-tag">
+                            TODAY
+                          </span>
+                        )}
+
+                        <div className="calendar-day-line" />
                       </div>
-                    </td>
 
-                    <td className="calendar-event-name">
-                      {event.event_name}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`calendar-impact ${event.impact}`}
-                      >
-                        {event.impact?.toUpperCase()}
+                      <span className="calendar-event-count">
+                        {group.events.length}{" "}
+                        {group.events.length === 1
+                          ? "event"
+                          : "events"}
                       </span>
-                    </td>
+                    </div>
 
-                    <td className="calendar-number actual">
-                      {event.actual ?? "—"}
-                    </td>
+                    <div className="calendar-table-scroll">
+                      <table className="calendar-table">
+                        <thead>
+                          <tr>
+                            <th>Time</th>
+                            <th>Currency</th>
+                            <th>Event</th>
+                            <th>Impact</th>
+                            <th>Actual</th>
+                            <th>Forecast</th>
+                            <th>Previous</th>
+                          </tr>
+                        </thead>
 
-                    <td className="calendar-number">
-                      {event.forecast ?? "—"}
-                    </td>
+                        <tbody>
+                          {group.events.map((event) => (
+                            <tr key={event.id}>
+                              <td className="calendar-time">
+                                {formatTime(event.event_time)}
+                              </td>
 
-                    <td className="calendar-number">
-                      {event.previous ?? "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                              <td>
+                                <div className="calendar-currency">
+                                  <span className="calendar-country">
+                                    {event.country}
+                                  </span>
+
+                                  <strong>
+                                    {event.currency}
+                                  </strong>
+                                </div>
+                              </td>
+
+                              <td className="calendar-event-name">
+                                {event.event_name}
+                              </td>
+
+                              <td>
+                                <span
+                                  className={`calendar-impact ${event.impact}`}
+                                >
+                                  {event.impact?.toUpperCase()}
+                                </span>
+                              </td>
+
+                              <td className="calendar-number actual">
+                                {event.actual ?? "—"}
+                              </td>
+
+                              <td className="calendar-number">
+                                {event.forecast ?? "—"}
+                              </td>
+
+                              <td className="calendar-number">
+                                {event.previous ?? "—"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                );
+              })
+            )}
           </div>
-        </section>
-      );
-    })
-  )}
-</div>
-
 
           <p className="calendar-disclaimer">
             Economic calendar data is automatically synchronized

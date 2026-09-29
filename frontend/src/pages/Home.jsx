@@ -157,19 +157,38 @@ const displayCalendarValue = (value) => {
 function Home() {
   const { t } = useTranslation();
 
-  const [calendarEvents, setCalendarEvents] =
-  useState([])
+  const [calendarEvents, setCalendarEvents] = useState([]);
+  const [calendarLoading, setCalendarLoading] = useState(true);
+  const [calendarError, setCalendarError] = useState(false);
 
-const loadTodayCalendar = async () => {
-  const start = new Date()
-  start.setHours(0, 0, 0, 0)
+  const calendarRequestIdRef = useRef(0);
+  const calendarEventsRef = useRef(calendarEvents);
 
-  const end = new Date()
-  end.setHours(23, 59, 59, 999)
+  useEffect(() => {
+    calendarEventsRef.current = calendarEvents;
+  }, [calendarEvents]);
 
-  const { data, error } = await supabase
-    .from('economic_events')
-    .select(`
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadTodayCalendar = async (showLoading) => {
+      const requestId = ++calendarRequestIdRef.current;
+
+      if (showLoading) {
+        setCalendarLoading(true);
+        setCalendarError(false);
+      }
+
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date();
+      end.setHours(23, 59, 59, 999);
+
+      const { data, error } = await supabase
+        .from("economic_events")
+        .select(
+          `
       id,
       event_time,
       country,
@@ -179,52 +198,77 @@ const loadTodayCalendar = async () => {
       actual,
       forecast,
       previous
-    `)
-    .gte('event_time', start.toISOString())
-    .lte('event_time', end.toISOString())
-    .order('event_time', {
-      ascending: true,
-    })
+    `,
+        )
+        .gte("event_time", start.toISOString())
+        .lte("event_time", end.toISOString())
+        .order("event_time", {
+          ascending: true,
+        });
 
-  if (error) {
-    console.error(
-      'Home calendar error:',
-      error
-    )
-    return
-  }
-
-  setCalendarEvents(data || [])
-}
-
-useEffect(() => {
-  loadTodayCalendar()
-
-  const channel = supabase
-    .channel('tradxa-home-calendar')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'economic_events',
-      },
-      () => {
-        loadTodayCalendar()
+      if (cancelled || requestId !== calendarRequestIdRef.current) {
+        return;
       }
-    )
-    .subscribe()
 
-  const fallback = setInterval(
-    loadTodayCalendar,
-    60000
-  )
+      if (error) {
+        console.error("Home calendar error:", error);
 
-  return () => {
-    clearInterval(fallback)
-    supabase.removeChannel(channel)
-  }
-}, [])
+        if (showLoading || calendarEventsRef.current.length === 0) {
+          setCalendarEvents([]);
+          setCalendarError(true);
+        }
+
+        setCalendarLoading(false);
+        return;
+      }
+
+      setCalendarError(false);
+      setCalendarEvents(data || []);
+      setCalendarLoading(false);
+    };
+
+    loadTodayCalendar(true);
+
+    const channel = supabase
+      .channel("tradxa-home-calendar")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "economic_events",
+        },
+        () => {
+          loadTodayCalendar(false);
+        },
+      )
+      .subscribe((status, err) => {
+        if (cancelled) {
+          return;
+        }
+
+        if (
+          status === "CHANNEL_ERROR" ||
+          status === "TIMED_OUT" ||
+          status === "CLOSED"
+        ) {
+          if (err) {
+            console.warn("Home calendar realtime status:", status, err);
+          }
+        }
+      });
+
+    const fallback = setInterval(() => {
+      loadTodayCalendar(false);
+    }, 60000);
+
+    return () => {
+      cancelled = true;
+      calendarRequestIdRef.current += 1;
+      clearInterval(fallback);
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
 
   const [impactFilters, setImpactFilters] = useState(allImpacts);
@@ -589,7 +633,13 @@ useEffect(() => {
         colSpan="7"
         className="calendar-empty"
       >
-        {t('calendar.noEvents')}
+        {calendarLoading && calendarEvents.length === 0
+          ? t("calendar.loading")
+          : calendarError && calendarEvents.length === 0
+            ? t("calendar.loadError")
+            : calendarEvents.length === 0
+              ? t("calendar.noEventsToday")
+              : t("calendar.noEvents")}
       </td>
     </tr>
   )}
