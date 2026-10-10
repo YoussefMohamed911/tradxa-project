@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import HomeMarketNews from "../components/MarketNews";
 import MarketBar from "../components/MarketBar";
 import NewsTicker from "../components/NewsTicker";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../Lib/supabase";
 
 import "./Home.css";
 

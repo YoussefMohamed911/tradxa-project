@@ -5,7 +5,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "./Auth.css";
 
-import { supabase } from "../lib/supabase";
+import { supabase } from "../Lib/supabase";
 
 function Register() {
   const [form, setForm] = useState({

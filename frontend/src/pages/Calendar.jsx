@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../Lib/supabase";
 import "./Calendar.css";
 
 const impacts = ["all", "high", "medium", "low"];

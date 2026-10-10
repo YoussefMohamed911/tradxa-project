@@ -10,7 +10,7 @@ import ThemeToggle from "./ThemeToggle";
 import InstallAppButton from "./InstallAppButton";
 
 import { useTheme } from "../context/ThemeContext";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../Lib/supabase";
 
 import "./Header.css";
 
