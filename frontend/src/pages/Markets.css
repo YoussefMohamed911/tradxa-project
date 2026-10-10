@@ -579,3 +579,10 @@ html[dir="rtl"] .markets-table th {
     font-size: 31px;
   }
 }
+
+.market-widget-container a[href*="tradingview"],
+.market-widget-container [class*="copyright"],
+.market-widget-container [class*="attribution"] {
+  font-size: 2px !important;
+  opacity: 0.1 !important;
+}

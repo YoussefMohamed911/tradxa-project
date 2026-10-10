@@ -1,178 +1,140 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import './MarketBar.css'
 
-const marketGroups = [
-  'all',
-  'metals',
-  'forex',
-  'energy',
-  'stocks',
+const TRADINGVIEW_SCRIPT_ID = 'tradxa-tradingview-ticker-script'
+const TRADINGVIEW_SCRIPT_SRC =
+  'https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js'
+
+const SYMBOLS = [
+  'OANDA:XAUUSD',
+  'OANDA:XAGUSD',
+  'FX:EURUSD',
+  'FX:GBPUSD',
+  'FX:USDJPY',
+  'TVC:USOIL',
+  'BITSTAMP:BTCUSD',
+  'BITSTAMP:ETHUSD',
+  'FOREXCOM:SPXUSD',
+  'FOREXCOM:NSXUSD',
 ]
 
-const markets = [
-  {
-    symbol: 'XAU/USD',
-    nameKey: 'market.instruments.gold',
-    price: '3,625.40',
-    change: '+0.42%',
-    group: 'metals',
-    direction: 'up',
-  },
-  {
-    symbol: 'XAG/USD',
-    nameKey: 'market.instruments.silver',
-    price: '42.18',
-    change: '+1.12%',
-    group: 'metals',
-    direction: 'up',
-  },
-  {
-    symbol: 'EUR/GBP',
-    nameKey: 'market.instruments.euroPound',
-    price: '0.8621',
-    change: '+0.15%',
-    group: 'forex',
-    direction: 'up',
-  },
-  {
-    symbol: 'EUR/JPY',
-    nameKey: 'market.instruments.euroYen',
-    price: '159.42',
-    change: '-0.11%',
-    group: 'forex',
-    direction: 'down',
-  },
-  {
-    symbol: 'USOIL',
-    nameKey: 'market.instruments.wti',
-    price: '68.32',
-    change: '-0.28%',
-    group: 'energy',
-    direction: 'down',
-  },
-  {
-    symbol: 'UKOIL',
-    nameKey: 'market.instruments.brent',
-    price: '71.54',
-    change: '+0.16%',
-    group: 'energy',
-    direction: 'up',
-  },
-  {
-    symbol: 'AAPL',
-    nameKey: 'market.instruments.apple',
-    price: '229.15',
-    change: '+0.32%',
-    group: 'stocks',
-    direction: 'up',
-  },
-  {
-    symbol: 'NVDA',
-    nameKey: 'market.instruments.nvidia',
-    price: '118.90',
-    change: '+1.08%',
-    group: 'stocks',
-    direction: 'up',
-  },
-]
+function loadTradingViewScript() {
+  return new Promise((resolve, reject) => {
+    const existingScript = document.getElementById(TRADINGVIEW_SCRIPT_ID)
+
+    if (existingScript) {
+      if (customElements.get('tv-ticker-tape')) {
+        resolve()
+        return
+      }
+
+      existingScript.addEventListener('load', resolve, { once: true })
+      existingScript.addEventListener('error', reject, { once: true })
+      return
+    }
+
+    const script = document.createElement('script')
+    script.id = TRADINGVIEW_SCRIPT_ID
+    script.type = 'module'
+    script.src = TRADINGVIEW_SCRIPT_SRC
+    script.async = true
+
+    script.addEventListener('load', resolve, { once: true })
+    script.addEventListener('error', reject, { once: true })
+
+    document.head.appendChild(script)
+  })
+}
 
 function MarketBar() {
-  const { t } = useTranslation()
-  const [activeGroup, setActiveGroup] =
-    useState('all')
+  const { i18n } = useTranslation()
+  const containerRef = useRef(null)
 
-  const filteredMarkets =
-    activeGroup === 'all'
-      ? markets
-      : markets.filter(
-          (market) =>
-            market.group === activeGroup
-        )
+  const [status, setStatus] = useState('loading')
 
-  const movingMarkets = [
-    ...filteredMarkets,
-    ...filteredMarkets,
-    ...filteredMarkets,
-  ]
+  const isArabic = i18n.language?.startsWith('ar')
+  const locale = isArabic ? 'ar' : 'en'
+
+  const isDark =
+    document.documentElement.getAttribute('data-theme') !== 'light'
+
+  useEffect(() => {
+    let cancelled = false
+
+    const mountWidget = async () => {
+      setStatus('loading')
+
+      try {
+        await loadTradingViewScript()
+
+        if (cancelled || !containerRef.current) return
+
+        containerRef.current.innerHTML = ''
+
+        const widget = document.createElement('tv-ticker-tape')
+
+        widget.setAttribute('symbols', SYMBOLS.join(','))
+        widget.setAttribute('locale', locale)
+        widget.setAttribute('theme', isDark ? 'dark' : 'light')       
+        widget.setAttribute('transparent', '')
+        widget.setAttribute('display-mode', 'adaptive')
+
+        containerRef.current.appendChild(widget)
+
+        if (!cancelled) {
+          setStatus('ready')
+        }
+      } catch (error) {
+        console.error('TradingView ticker failed to load:', error)
+
+        if (!cancelled) {
+          setStatus('error')
+        }
+      }
+    }
+
+    mountWidget()
+
+    return () => {
+      cancelled = true
+
+      if (containerRef.current) {
+        containerRef.current.innerHTML = ''
+      }
+    }
+  }, [locale, isDark])
 
   return (
     <section className="market-section">
       <div className="container">
         <div className="market-shell">
 
-          <div className="market-header-row">
-            <div className="market-tabs-row">
-
-              {marketGroups.map((group) => (
-                <button
-                  key={group}
-                  type="button"
-                  className={`market-tab-btn ${
-                    activeGroup === group
-                      ? 'active'
-                      : ''
-                  }`}
-                  onClick={() =>
-                    setActiveGroup(group)
-                  }
-                >
-                  {t(`market.${group}`)}
-                </button>
-              ))}
-
+          {status === 'loading' && (
+            <div className="market-widget-state">
+              Loading live market data...
             </div>
-          </div>
+          )}
 
-          <div className="market-tape">
-            <div className="market-tape-track">
-
-              {movingMarkets.map(
-                (market, index) => (
-                  <article
-                    className="market-tape-item"
-                    key={`${market.symbol}-${index}`}
-                  >
-
-                    <div className="market-main-data">
-
-                      <div className="market-symbol-row">
-                        <span className="market-symbol">
-                          {market.symbol}
-                        </span>
-
-                        <span
-                          className={`market-direction-dot ${market.direction}`}
-                        />
-                      </div>
-
-                      <strong className="market-price">
-                        {market.price}
-                      </strong>
-
-                      <div className="market-meta">
-
-                        <span className="market-name">
-                          {t(market.nameKey)}
-                        </span>
-
-                        <span
-                          className={`market-change ${market.direction}`}
-                        >
-                          {market.change}
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                  </article>
-                )
-              )}
-
+          {status === 'error' && (
+            <div className="market-widget-state market-widget-error">
+              Live market data is temporarily unavailable.
             </div>
-          </div>
+          )}
+
+          <div
+  ref={containerRef}
+  className={`market-widget-container ${
+    status === 'ready' ? 'is-ready' : ''
+  }`}
+  onClickCapture={(event) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }}
+/>
+
+
 
         </div>
       </div>

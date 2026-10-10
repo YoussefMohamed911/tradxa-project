@@ -72,6 +72,25 @@ function Calendar() {
   useEffect(() => {
     let cancelled = false;
 
+    let realtimeConnected = false;
+    let refreshTimer;
+    let refreshNeeded = false;
+    const scheduleRefresh = () => {
+      if (cancelled) return;
+      refreshNeeded = true;
+      if (document.hidden || refreshTimer) return;
+      refreshTimer = setTimeout(() => {
+        refreshTimer = undefined;
+        if (cancelled || document.hidden) return;
+        refreshNeeded = false;
+        loadEvents(false);
+      }, 500);
+    };
+    const onCalendarVisible = () => {
+      if (!document.hidden) scheduleRefresh();
+    };
+    document.addEventListener("visibilitychange", onCalendarVisible);
+
     async function loadEvents(showLoading) {
       const requestId = ++requestIdRef.current;
 
@@ -135,11 +154,11 @@ function Calendar() {
           schema: "public",
           table: "economic_events",
         },
-        () => {
-          loadEvents(false);
-        }
+        scheduleRefresh
       )
       .subscribe((status, err) => {
+        realtimeConnected = status === "SUBSCRIBED";
+        if (realtimeConnected) scheduleRefresh();
         if (cancelled) {
           return;
         }
@@ -161,13 +180,15 @@ function Calendar() {
       });
 
     const fallback = setInterval(() => {
-      loadEvents(false);
+      if (!document.hidden && (!realtimeConnected || refreshNeeded)) scheduleRefresh();
     }, 60000);
 
     return () => {
       cancelled = true;
       requestIdRef.current += 1;
       clearInterval(fallback);
+      clearTimeout(refreshTimer);
+      document.removeEventListener("visibilitychange", onCalendarVisible);
       supabase.removeChannel(channel);
       setRealtimeLive(false);
     };
@@ -187,7 +208,6 @@ function Calendar() {
     return events.filter((event) => {
       const impactMatch =
         impact === "all" || event.impact === impact;
-
       const currencyMatch =
         currency === "all" || event.currency === currency;
 
@@ -236,7 +256,7 @@ function Calendar() {
     !loading && !error && events.length === 0;
   const showEmptyFilters =
     !loading && events.length > 0 && groupedEvents.length === 0;
-
+                 
   return (
     <main className="calendar-page">
       <section className="calendar-hero">
